@@ -6,11 +6,11 @@
 #define NOWTECH_LOG_APP_INTERFACE_FREERTOS_MINIMAL
 
 #include "Log.h"
-#include <array>
 #include "FreeRTOS.h"
+// #include "portmacro.h" // xPortInIsrContext
 #include "task.h"
 #include "semphr.h"
-#include "stm32f1xx_hal.h"
+#include <array>
 
 extern "C" void logTransmitterTask(void* aFunction);
 
@@ -37,7 +37,7 @@ public:
     void release(void* const aPointer) noexcept {
       delete[](static_cast<std::byte*>(aPointer));
     }
-    
+
     void badAlloc() {
       while(true) {
       }
@@ -202,8 +202,11 @@ public:
   }
 
 private:
-  static bool isInterrupt() noexcept {   // Well, this is STM32-specific, but can easily be changed to other MCUs as well.
-    return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
+  static bool isInterrupt() noexcept {
+    // Platform specfic code
+    // xPortIsInsideInterrupt
+    // xPortCheckIfInISR
+    return xPortInIsrContext() == pdTRUE;
   }
 
 };

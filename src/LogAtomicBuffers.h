@@ -1,9 +1,9 @@
 #ifndef NOWTECH_LOG_ATOMIC_BUFFERS
 #define NOWTECH_LOG_ATOMIC_BUFFERS
 
-#include<atomic>
-#include<utility>
-#include<algorithm>
+#include <atomic>
+#include <utility>
+#include <algorithm>
 
 namespace nowtech::log {
 

@@ -201,7 +201,7 @@ For desktop, I used clang version 10.0.0 on x64. For embedded, I used arm-none-e
 
 ### FreeRTOS with floating point
 
-To obtain net results, I put some floating-point operations in the application *test-sizes-freertosminimal-float.cpp* because a real application would use them apart of logging. 
+To obtain net results, I put some floating-point operations in the application *test-sizes-freertosminimal-float.cpp* because a real application would use them apart of logging.
 
 |Atomic|Mode              |   Text|  Data|    BSS|
 |------|------------------|------:|-----:|------:|
@@ -273,35 +273,42 @@ Log system initialiation consists of the following steps:
 Refer the beginning for an example for STL without the first step. Here is a FreeRTOS template declaration without floating point support but for multithreaded mode:
 
 ```C++
+
+constexpr size_t cgPayloadSize = 14u;
+constexpr bool cgSupportFloatingPoint = true;
+using LogMessage = nowtech::log::MessageCompact<cgPayloadSize, cgSupportFloatingPoint>;
+
 constexpr nowtech::log::TaskId cgMaxTaskCount = cgThreadCount + 1;
-constexpr bool cgAllowRegistrationLog = true;
 constexpr bool cgLogFromIsr = false;
 constexpr size_t cgTaskShutdownSleepPeriod = 100u;
+using LogAppInterface = nowtech::log::AppInterfaceStd<cgMaxTaskCount, cgLogFromIsr, cgTaskShutdownSleepPeriod>;
+
+constexpr size_t cgQueueSize = 444u;
+using LogQueue = nowtech::log::QueueStdBoost<LogMessage, LogAppInterface, cgQueueSize>;
+
 constexpr bool cgArchitecture64 = true;
 constexpr uint8_t cgAppendStackBufferSize = 100u;
 constexpr bool cgAppendBasePrefix = true;
 constexpr bool cgAlignSigned = false;
+using LogConverter = nowtech::log::ConverterCustomText<LogMessage, cgArchitecture64, cgAppendStackBufferSize, cgAppendBasePrefix, cgAlignSigned>;
+
+constexpr size_t cgTransmitBufferSize = 123u;
+constexpr typename LogAppInterface::LogTime cgTimeout = 123u;
+using LogSender = nowtech::log::SenderStdOstream<LogAppInterface, LogConverter, cgTransmitBufferSize, cgTimeout>;
+
 using AtomicBufferType = int32_t;
 constexpr size_t cgAtomicBufferExponent = 14u;
 constexpr AtomicBufferType cgAtomicBufferInvalidValue = 1234546789;
-constexpr size_t cgTransmitBufferSize = 123u;
-constexpr size_t cgPayloadSize = 14u;
-constexpr bool cgSupportFloatingPoint = true;
-constexpr size_t cgQueueSize = 444u;
+using LogAtomicBuffer = nowtech::log::AtomicBufferOperational<LogAppInterface, AtomicBufferType, cgAtomicBufferExponent, cgAtomicBufferInvalidValue>;
+
+constexpr bool cgAllowRegistrationLog = true;
 constexpr nowtech::log::LogTopic cgMaxTopicCount = 2;
 constexpr nowtech::log::TaskRepresentation cgTaskRepresentation = nowtech::log::TaskRepresentation::cName;
 constexpr size_t cgDirectBufferSize = 0u;
-constexpr nowtech::log::ErrorLevel cgErrorLevel = nowtech::log::ErrorLevel::Error;
-
-using LogAppInterface = nowtech::log::AppInterfaceStd<cgMaxTaskCount, cgLogFromIsr, cgTaskShutdownSleepPeriod>;
-constexpr typename LogAppInterface::LogTime cgTimeout = 123u;
 constexpr typename LogAppInterface::LogTime cgRefreshPeriod = 444;
-using LogMessage = nowtech::log::MessageCompact<cgPayloadSize, cgSupportFloatingPoint>;
-using LogConverter = nowtech::log::ConverterCustomText<LogMessage, cgArchitecture64, cgAppendStackBufferSize, cgAppendBasePrefix, cgAlignSigned>;
-using LogSender = nowtech::log::SenderStdOstream<LogAppInterface, LogConverter, cgTransmitBufferSize, cgTimeout>;
-using LogQueue = nowtech::log::QueueStdBoost<LogMessage, LogAppInterface, cgQueueSize>;
-using LogAtomicBuffer = nowtech::log::AtomicBufferOperational<LogAppInterface, AtomicBufferType, cgAtomicBufferExponent, cgAtomicBufferInvalidValue>;
+constexpr nowtech::log::ErrorLevel cgErrorLevel = nowtech::log::ErrorLevel::Error;
 using LogConfig = nowtech::log::Config<cgAllowRegistrationLog, cgMaxTopicCount, cgTaskRepresentation, cgDirectBufferSize, cgRefreshPeriod, cgErrorLevel>;
+
 using Log = nowtech::log::Log<LogQueue, LogSender, LogAtomicBuffer, LogConfig>;
 ```
 
