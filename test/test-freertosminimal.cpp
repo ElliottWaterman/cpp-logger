@@ -64,7 +64,7 @@ using LogConverterCustomText = nowtech::log::ConverterCustomText<LogMessage, cgA
 using LogSenderStmHalMinimal = nowtech::log::SenderStmHalMinimal<LogAppInterfaceFreeRtosMinimal, LogConverterCustomText, cgTransmitBufferSize, cgTimeout>;
 using LogQueueVoid = nowtech::log::QueueFreeRtos<LogMessage, LogAppInterfaceFreeRtosMinimal, cgQueueSize>;
 using Log = nowtech::log::Log<LogQueueVoid, LogSenderStmHalMinimal, cgMaxTopicCount, cgTaskRepresentation, cgDirectBufferSize, cgRefreshPeriod>;
- 
+
 void step() {
   HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
   vTaskDelay(133);

@@ -5,10 +5,9 @@
 #ifndef NOWTECH_LOG_QUEUE_FREERTOS
 #define NOWTECH_LOG_QUEUE_FREERTOS
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 #include <cstddef>
-#include "FreeRTOS.h"
-#include "queue.h"
-#include "stm32f1xx_hal.h"
 
 namespace nowtech::log {
 

@@ -273,7 +273,6 @@ Log system initialiation consists of the following steps:
 Refer the beginning for an example for STL without the first step. Here is a FreeRTOS template declaration without floating point support but for multithreaded mode:
 
 ```C++
-
 constexpr size_t cgPayloadSize = 14u;
 constexpr bool cgSupportFloatingPoint = true;
 using LogMessage = nowtech::log::MessageCompact<cgPayloadSize, cgSupportFloatingPoint>;
