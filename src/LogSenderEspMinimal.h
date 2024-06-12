@@ -9,8 +9,6 @@
 
 #include <cstdio>
 
-static const char* TAG = "LOG";
-
 namespace nowtech::log {
 
 // For slow transmission medium like UART on embedded this class could implement double buffering.
@@ -47,7 +45,8 @@ public:
     static void send(char const * const aBegin, char const * const aEnd) {
         // printf
         // esp_log_write(ESP_LOG_INFO, "SEND", aBegin, aEnd - aBegin);
-        ESP_LOGI(TAG, "%.*s", aBegin, aEnd - aBegin);
+        // ESP_LOGI("LOG", "'%.*s'", aEnd - aBegin, aBegin);
+        printf("%.*s", aEnd - aBegin, aBegin);
 
         // if (sSerialDescriptor != nullptr) {
         //     HAL_UART_Transmit(sSerialDescriptor, reinterpret_cast<uint8_t*>(const_cast<char*>(aBegin)), aEnd - aBegin, tTimeout);

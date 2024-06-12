@@ -39,42 +39,42 @@ namespace nowtech::LogTopics {
   nowtech::log::TopicInstance surplus;
 }
 
+
+constexpr size_t cgQueueSize = 111u;
+constexpr uint32_t cgLogTaskStackSize = 256u;
+constexpr uint32_t cgLogTaskPriority = tskIDLE_PRIORITY + 1u;
+
+
+constexpr size_t cgPayloadSize = 6u;
+constexpr bool cgSupportFloatingPoint = true;
+using LogMessage = nowtech::log::MessageCompact<cgPayloadSize, cgSupportFloatingPoint>;
 constexpr nowtech::log::TaskId cgMaxTaskCount = 1u;
-constexpr bool cgAllowRegistrationLog = true;
 constexpr bool cgLogFromIsr = false;
 constexpr size_t cgTaskShutdownSleepPeriod = 100u;
+using LogAppInterface = nowtech::log::AppInterfaceFreeRtosMinimal<cgMaxTaskCount, cgLogFromIsr, cgTaskShutdownSleepPeriod>;
+using LogQueue = nowtech::log::QueueVoid<LogMessage, LogAppInterface>;
 constexpr bool cgArchitecture64 = false;
 constexpr uint8_t cgAppendStackBufferSize = 100u;
 constexpr bool cgAppendBasePrefix = true;
 constexpr bool cgAlignSigned = false;
+using LogConverter = nowtech::log::ConverterCustomText<LogMessage, cgArchitecture64, cgAppendStackBufferSize, cgAppendBasePrefix, cgAlignSigned>;
+constexpr size_t cgTransmitBufferSize = 123u;
+constexpr typename LogAppInterface::LogTime cgTimeout = 123u;
+using LogSender = nowtech::log::SenderStmHalMinimal<LogAppInterface, LogConverter, cgTransmitBufferSize, cgTimeout>;
 using AtomicBufferType = int32_t;
 constexpr size_t cgAtomicBufferExponent = 14u;
 constexpr AtomicBufferType cgAtomicBufferInvalidValue = 1234546789;
-constexpr size_t cgTransmitBufferSize = 123u;
-constexpr size_t cgPayloadSize = 6u;
-constexpr bool cgSupportFloatingPoint = true;
-constexpr size_t cgQueueSize = 111u;
-constexpr nowtech::log::LogTopic cgMaxTopicCount = 2;
-constexpr nowtech::log::TaskRepresentation cgTaskRepresentation = nowtech::log::TaskRepresentation::cId;
-constexpr nowtech::log::ErrorLevel cgErrorLevel = nowtech::log::ErrorLevel::Error;
-
-constexpr uint32_t cgLogTaskStackSize = 256u;
-constexpr uint32_t cgLogTaskPriority = tskIDLE_PRIORITY + 1u;
-using LogAppInterface = nowtech::log::AppInterfaceFreeRtosMinimal<cgMaxTaskCount, cgLogFromIsr, cgTaskShutdownSleepPeriod>;
-constexpr typename LogAppInterface::LogTime cgTimeout = 123u;
-constexpr typename LogAppInterface::LogTime cgRefreshPeriod = 444;
-
 //using LogAtomicBuffer = nowtech::log::AtomicBufferVoid;
 using LogAtomicBuffer = nowtech::log::AtomicBufferOperational<LogAppInterface, AtomicBufferType, cgAtomicBufferExponent, cgAtomicBufferInvalidValue>;
-
+constexpr bool cgAllowRegistrationLog = true;
+constexpr nowtech::log::LogTopic cgMaxTopicCount = 2;
+constexpr nowtech::log::TaskRepresentation cgTaskRepresentation = nowtech::log::TaskRepresentation::cId;
 constexpr size_t cgDirectBufferSize = 43u;
-using LogMessage = nowtech::log::MessageCompact<cgPayloadSize, cgSupportFloatingPoint>;
-using LogConverter = nowtech::log::ConverterCustomText<LogMessage, cgArchitecture64, cgAppendStackBufferSize, cgAppendBasePrefix, cgAlignSigned>;
-using LogSender = nowtech::log::SenderStmHalMinimal<LogAppInterface, LogConverter, cgTransmitBufferSize, cgTimeout>;
-using LogQueue = nowtech::log::QueueVoid<LogMessage, LogAppInterface>;
+constexpr typename LogAppInterface::LogTime cgRefreshPeriod = 444;
+constexpr nowtech::log::ErrorLevel cgErrorLevel = nowtech::log::ErrorLevel::Error;
 using LogConfig = nowtech::log::Config<cgAllowRegistrationLog, cgMaxTopicCount, cgTaskRepresentation, cgDirectBufferSize, cgRefreshPeriod, cgErrorLevel>;
 using Log = nowtech::log::Log<LogQueue, LogSender, LogAtomicBuffer, LogConfig>;
-/*   text    data     bss     dec     hex filename
+/*     text       data  bss     dec      hex  filename
 noat   22180      132   19072   41384    a1a8 cpp-logger-embedded.elf
 atom   22508      132   19096   41736    a308 cpp-logger-embedded.elf
 new    22508      132   19096   41736    a308 cpp-logger-embedded.elf
@@ -93,7 +93,7 @@ using LogSender = nowtech::log::SenderVoid<LogAppInterface, LogConverter, cgTran
 using LogQueue = nowtech::log::QueueVoid<LogMessage, LogAppInterface>;
 using LogConfig = nowtech::log::Config<cgAllowRegistrationLog, cgMaxTopicCount, cgTaskRepresentation, cgDirectBufferSize, cgRefreshPeriod, cgErrorLevel>;
 using Log = nowtech::log::Log<LogQueue, LogSender, LogAtomicBuffer, LogConfig>;
-   text    data     bss     dec     hex filename
+        text     data   bss     dec      hex  filename
 noat    9108       24   19016   28148    6df4 cpp-logger-embedded.elf
 atom    9108       24   19016   28148    6df4 cpp-logger-embedded.elf
  */
@@ -105,7 +105,7 @@ using LogSender = nowtech::log::SenderStmHalMinimal<LogAppInterface, LogConverte
 using LogQueue = nowtech::log::QueueFreeRtos<LogMessage, LogAppInterface, cgQueueSize>;
 using LogConfig = nowtech::log::Config<cgAllowRegistrationLog, cgMaxTopicCount, cgTaskRepresentation, cgDirectBufferSize, cgRefreshPeriod, cgErrorLevel>;
 using Log = nowtech::log::Log<LogQueue, LogSender, LogAtomicBuffer, LogConfig>;
-    text    data     bss     dec     hex filename
+       text      data   bss     dec      hex  filename
 noat   24380      132   19104   43616    aa60 cpp-logger-embedded.elf
 atom   25108      132   19128   44368    ad50 cpp-logger-embedded.elf
 */
@@ -117,7 +117,7 @@ using LogSender = nowtech::log::SenderStmHalMinimal<LogAppInterface, LogConverte
 using LogQueue = nowtech::log::QueueFreeRtos<LogMessage, LogAppInterface, cgQueueSize>;
 using LogConfig = nowtech::log::Config<cgAllowRegistrationLog, cgMaxTopicCount, cgTaskRepresentation, cgDirectBufferSize, cgRefreshPeriod, cgErrorLevel>;
 using Log = nowtech::log::Log<LogQueue, LogSender, LogAtomicBuffer, LogConfig>;
-   text    data     bss     dec     hex filename
+       text       data  bss     dec      hex  filename
 noat   24092      132   19104   43328    a940 cpp-logger-embedded.elf
 atom   24820      132   19128   44080    ac30 cpp-logger-embedded.elf
  */

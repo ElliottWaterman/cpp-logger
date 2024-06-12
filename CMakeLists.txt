@@ -18,6 +18,7 @@ add_library(cpp-logger STATIC
     # src/LogQueueStdBoost.h
     # src/LogQueueStdCircular.h
     src/LogQueueVoid.h
+    src/LogSenderEspMinimal.h
     # src/LogSenderRos2.h
     # src/LogSenderStdOstream.h
     # src/LogSenderStmHalMinimal.h

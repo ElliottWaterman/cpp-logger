@@ -12,7 +12,7 @@
 #include <array>
 
 namespace nowtech::log {
-  
+
 enum class Exception : uint8_t {
   cOutOfTaskIdsOrDoubleRegistration = 0u,
   cOutOfTopics                      = 1u,
@@ -185,9 +185,9 @@ private:
   static_assert(std::is_integral_v<tAtomicBufferType>);
   static_assert(csAtomicBufferSizeExponent <= csMaxAtomicBufferSizeExp);
 
-  inline static constexpr char csRegisteredTask[]    = "-=- Registered task:";
-  inline static constexpr char csUnregisteredTask[]  = "-=- Unregistered task:";
-  
+  inline static constexpr char csRegisteredTask[]    = ">>> Registered task:";
+  inline static constexpr char csUnregisteredTask[]  = ">>> Unregistered task:";
+
   inline static LogFormatConfig const                 *sConfig;
   inline static std::atomic<LogTopic>                  sNextFreeTopic;
   inline static std::atomic<bool>                      sKeepAliveTask;
@@ -384,7 +384,10 @@ private:
         tConverter converter(buffer, buffer + csDirectBufferSize);
         converter.terminateSequence();
         tAppInterface::lock();
-        tSender::send(buffer, converter.end());
+#pragma GCC diagnostic push                             // save the actual diag context
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"  // disable maybe warnings
+        tSender::send(buffer, converter.end());         // impacted section of code
+#pragma GCC diagnostic pop                              // restore previous diag context
         tAppInterface::unlock();
       }
       else { // nothing to do
@@ -392,7 +395,7 @@ private:
     }
   }; // class LogShiftChainHelperDirectSend
 
-  /// This shuts down all logging code generation without uncommenting anything from user code, when compiled with aT least -O1 
+  /// This shuts down all logging code generation without uncommenting anything from user code, when compiled with aT least -O1
   class LogShiftChainHelperEmpty final {
   public:
     LogShiftChainHelperEmpty() noexcept = delete;
@@ -699,6 +702,11 @@ public:
   static void f(LogShiftChainHelper aHead, tArgs &&... aArgs) noexcept {
     (aHead << ... << aArgs) << end;
   }
+  // template<typename ...tArgs>
+  // static void f(LogShiftChainHelper aHead, tArgs &&... aArgs) noexcept {
+  //   // Fold expression with a separator between arguments
+  //   (((aHead << separator << aArgs), separator = " "), ...);
+  // }
 
 private:
   template <typename tLogShiftChainHelper>

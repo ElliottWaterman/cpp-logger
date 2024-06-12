@@ -6,10 +6,12 @@
 #define NOWTECH_LOG_APP_INTERFACE_FREERTOS_MINIMAL
 
 #include "Log.h"
-#include "FreeRTOS.h"
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/semphr.h>
 // #include "portmacro.h" // xPortInIsrContext
-#include "task.h"
-#include "semphr.h"
+
 #include <array>
 
 extern "C" void logTransmitterTask(void* aFunction);
@@ -152,6 +154,7 @@ public:
   }
 
   static void sleepWhileWaitingForTaskShutdown() noexcept {
+    // vTaskDelay(pdMS_TO_TICKS(tTaskShutdownPollPeriod));
     vTaskDelay(tTaskShutdownPollPeriod / portTICK_PERIOD_MS);
   }
 
@@ -203,12 +206,11 @@ public:
 
 private:
   static bool isInterrupt() noexcept {
-    // Platform specfic code
+    // Platform specfic code for checking ISR context should be defined inside portmacro.h
     // xPortIsInsideInterrupt
     // xPortCheckIfInISR
     return xPortInIsrContext() == pdTRUE;
   }
-
 };
 
 }
@@ -236,6 +238,5 @@ inline void operator delete[](void *aPointer) noexcept {
 inline void operator delete[](void *aPointer, size_t) noexcept {
   vPortFree(aPointer);
 }
-
 
 #endif
